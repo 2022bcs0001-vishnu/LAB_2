@@ -1,0 +1,12 @@
+{
+  "model": "RandomForestRegressor",
+  "features": [
+    "alcohol",
+    "volatile acidity",
+    "sulphates",
+    "density"
+  ],
+  "n_estimators": 200,
+  "mse": 0.36756039062500007,
+  "r2": 0.4375560901985983
+}
