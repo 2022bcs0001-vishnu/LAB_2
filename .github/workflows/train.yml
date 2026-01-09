@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: model
-          path: outputs/models/
+          path: outputs/model/
 
       - name: upload evaluation results
         uses: actions/upload-artifact@v4
