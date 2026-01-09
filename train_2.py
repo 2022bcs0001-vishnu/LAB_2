@@ -16,6 +16,7 @@ os.makedirs("outputs/results",exist_ok=True)
 
 #load data
 df=pd.read_csv("dataset/winequality-red.csv",sep=";")
+df.columns=df.columns.str.strip()
 
 res=[]
 
