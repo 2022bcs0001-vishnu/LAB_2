@@ -34,7 +34,9 @@ jobs:
         id: read-metrics
         run: |
           mse=$(jq '.[-1].mse' outputs/results/result.json)
+          r2=$(jq '.[-1].r2' outputs/results/result.json)
           echo "mse=$mse" >> $GITHUB_OUTPUT
+          echo "r2=$r2" >> $GITHUB_OUTPUT
 
       - name: Upload model artifact
         uses: actions/upload-artifact@v4
@@ -57,9 +59,11 @@ jobs:
       - name: Check metric improvement
         run: |
           echo "Current MSE: ${{ needs.train.outputs.mse }}"
-          echo "Best MSE: ${{ vars.BEST_MSE }}"
+          echo "Current R2 : ${{ needs.train.outputs.r2 }}"
+          echo "Best MSE    : ${{ vars.BEST_MSE }}"
+          echo "Best R2    : ${{ vars.BEST_R2 }}"
 
-          better=$(echo "${{ needs.train.outputs.mse }} < ${{ vars.BEST_MSE }}" | bc -l)
+          better=$(echo "${{ needs.train.outputs.r2 }} > ${{ vars.BEST_R2 }}" | bc -l)
           if [ "$better" -ne 1 ]; then
             echo "2022BCS0001 ---- Metric did not improve"
             exit 0
