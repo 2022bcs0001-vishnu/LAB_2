@@ -1,0 +1,98 @@
+name: lab4-ci-cd-deployment
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  train:
+    name: Train Model (CI)
+    runs-on: ubuntu-latest
+
+    outputs:
+      mse: ${{ steps.read-metrics.outputs.mse }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run training script
+        run: |
+          python scripts/train.py
+
+      - name: Read metrics
+        id: read-metrics
+        run: |
+          mse=$(jq '.mse' outputs/results/metrics.json)
+          echo "mse=$mse" >> $GITHUB_OUTPUT
+
+      - name: Upload model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: model
+          path: outputs/model/
+
+      - name: Upload metrics artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: metrics
+          path: outputs/results/metrics.json
+
+  deploy:
+    name: Deploy Model (CD)
+    needs: train
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check metric improvement
+        run: |
+          echo "Current MSE: ${{ needs.train.outputs.mse }}"
+          echo "Best MSE: ${{ vars.BEST_MSE }}"
+
+          better=$(echo "${{ needs.train.outputs.mse }} < ${{ vars.BEST_MSE }}" | bc -l)
+          if [ "$better" -ne 1 ]; then
+            echo "2022BCS0001 ---- Metric did not improve"
+            exit 0
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download model artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: model
+          path: outputs/model/
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wine-quality-api:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wine-quality-api:latest
+
+      - name: Update BEST_MSE variable
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          gh api \
+            --method PATCH \
+            repos/${{ github.repository }}/actions/variables/BEST_MSE \
+            -f value=${{ needs.train.outputs.mse }}
