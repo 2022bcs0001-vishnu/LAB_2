@@ -46,7 +46,11 @@ def predict(data: WineInput):
         data.alcohol
     ]]
     y = model.predict(x)[0]
-    return {"predicted_quality": float(y)}
+    return {
+    "name": "Vishnu Narayanan",
+    "roll_no": "2022BCS0001",
+    "wine_quality": int(round(y))
+    }
 
 
 # ---------- Metrics ----------
