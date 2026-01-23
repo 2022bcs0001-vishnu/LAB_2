@@ -33,7 +33,7 @@ jobs:
       - name: Read metrics
         id: read-metrics
         run: |
-          mse=$(jq '.mse' outputs/results/result.json)
+          mse=$(jq '.[-1].mse' outputs/results/result.json)
           echo "mse=$mse" >> $GITHUB_OUTPUT
 
       - name: Upload model artifact
@@ -77,20 +77,20 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.centronox }}
+          password: ${{ secrets.dckr_pat_gxbJXHHtzChJYXmemWudPemGxTQ }}
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wine-quality-api:latest .
+          docker build -t ${{ secrets.centronox }}/wine-quality-api:latest .
 
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wine-quality-api:latest
+          docker push ${{ secrets.centronox }}/wine-quality-api:latest
 
       - name: Update BEST_MSE variable
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.2022BCS0001_PAT }}
         run: |
           gh api \
             --method PATCH \
