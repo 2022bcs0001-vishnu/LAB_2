@@ -90,7 +90,7 @@ jobs:
 
       - name: Update BEST_MSE variable
         env:
-          GH_TOKEN: ${{ secrets.2022BCS0001_PAT }}
+          GH_TOKEN: ${{ secrets.GH_SECRET }}
         run: |
           gh api \
             --method PATCH \
