@@ -28,7 +28,7 @@ jobs:
 
       - name: Run training script
         run: |
-          python train_2.py
+          python scripts/train_2.py
 
       - name: Read metrics
         id: read-metrics
