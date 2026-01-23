@@ -33,7 +33,7 @@ jobs:
       - name: Read metrics
         id: read-metrics
         run: |
-          mse=$(jq '.mse' outputs/results/metrics.json)
+          mse=$(jq '.mse' outputs/results/result.json)
           echo "mse=$mse" >> $GITHUB_OUTPUT
 
       - name: Upload model artifact
@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: metrics
-          path: outputs/results/metrics.json
+          path: outputs/results/result.json
 
   deploy:
     name: Deploy Model (CD)
