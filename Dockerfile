@@ -12,8 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # 5. Copy application code and model
 COPY app.py .
-COPY model.joblib .
-COPY result.json .
+COPY outputs/model/model.joblib .
+COPY outputs/results/result.json .
 
 # 6. Expose FastAPI port
 EXPOSE 8000
