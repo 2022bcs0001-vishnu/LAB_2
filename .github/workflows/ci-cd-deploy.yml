@@ -11,6 +11,8 @@ jobs:
 
     outputs:
       mse: ${{ steps.read-metrics.outputs.mse }}
+      r2:  ${{ steps.read-metrics.outputs.r2 }}
+
 
     steps:
       - name: Checkout repository
