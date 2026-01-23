@@ -92,7 +92,7 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/wine-quality-api:latest
 
-      - name: Update BEST_MSE variable
+      - name: Update BEST_MSE and BEST_R2 variables
         env:
           GH_TOKEN: ${{ secrets.GH_SECRET }}
         run: |
@@ -100,3 +100,7 @@ jobs:
             --method PATCH \
             repos/${{ github.repository }}/actions/variables/BEST_MSE \
             -f value=${{ needs.train.outputs.mse }}
+          gh api \
+            --method PATCH \
+            repos/${{ github.repository }}/actions/variables/BEST_R2 \
+            -f value=${{ needs.train.outputs.r2 }}
