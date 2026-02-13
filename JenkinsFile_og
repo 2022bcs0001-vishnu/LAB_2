@@ -1,0 +1,24 @@
+FROM jenkins/jenkins:lts
+
+USER root
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    jq \
+    bc \
+    curl \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Docker CLI inside Jenkins container
+RUN curl -fsSL https://get.docker.com | sh
+
+# Give Jenkins user access to Docker
+RUN usermod -aG docker jenkins
+
+USER jenkins
