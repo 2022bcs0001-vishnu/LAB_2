@@ -18,6 +18,7 @@ pipeline {
         stage('Run Container') {
             steps {
                 sh '''
+                docker rm -f $CONTAINER || true
                 docker run -d -p $PORT:8000 --name $CONTAINER $IMAGE
                 '''
             }
@@ -27,7 +28,7 @@ pipeline {
             steps {
                 sh '''
                 timeout=30
-                until curl -s -o /dev/null -w "%{http_code}" http://localhost:$PORT/health | grep -q 200; do
+                until curl -s -o /dev/null -w "%{http_code}" http://host.docker.internal:$PORT/health | grep -q 200; do
                     if [ $timeout -le 0 ]; then
                         echo "API did not start"
                         exit 1
@@ -43,13 +44,13 @@ pipeline {
         stage('Valid Inference Test') {
             steps {
                 sh '''
-                response=$(curl -s -X POST http://localhost:$PORT/predict \
+                response=$(curl -s -X POST http://host.docker.internal:$PORT/predict \
                 -H "Content-Type: application/json" \
                 -d @tests/valid_input.json)
 
                 echo "Valid Response: $response"
 
-                echo $response | jq '.prediction' > /dev/null || exit 1
+                echo $response | jq '.wine_quality' > /dev/null || exit 1
                 '''
             }
         }
@@ -58,7 +59,7 @@ pipeline {
             steps {
                 sh '''
                 status=$(curl -s -o /dev/null -w "%{http_code}" \
-                -X POST http://localhost:$PORT/predict \
+                -X POST http://host.docker.internal:$PORT/predict \
                 -H "Content-Type: application/json" \
                 -d @tests/invalid_input.json)
 
@@ -66,6 +67,8 @@ pipeline {
                     echo "Invalid input should not return 200"
                     exit 1
                 fi
+
+                echo "Invalid input correctly rejected"
                 '''
             }
         }
