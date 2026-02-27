@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE = "centrononx/wine-quality-api:latest"
+        IMAGE = "centronox/wine-quality-api:latest"
         CONTAINER = "wine-test-container"
         PORT = "8000"
     }
