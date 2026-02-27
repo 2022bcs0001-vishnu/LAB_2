@@ -78,16 +78,6 @@ pipeline {
                 '''
             }
         }
-        stage('Debug Container') {
-            steps {
-                sh '''
-                echo "==== Running Containers ===="
-                docker ps -a
-                echo "==== Container Logs ===="
-                docker logs wine-test-container
-                '''
-            }   
-        }
     }
 
     post {
