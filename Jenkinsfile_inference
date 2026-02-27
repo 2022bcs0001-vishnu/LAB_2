@@ -27,7 +27,7 @@ pipeline {
             steps {
                 sh '''
                 timeout=30
-                until curl -s http://localhost:$PORT/health || [ $timeout -le 0 ]; do
+                until curl -s http://wine-test-container:8000/health || [ $timeout -le 0 ]; do
                     sleep 2
                     timeout=$((timeout-2))
                 done
