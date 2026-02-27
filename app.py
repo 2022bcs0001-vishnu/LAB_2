@@ -61,3 +61,7 @@ def get_metrics():
 
     with open(RESULTS_PATH, "r") as f:
         return json.load(f)
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
